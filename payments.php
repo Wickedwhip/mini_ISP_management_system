@@ -1,8 +1,12 @@
 <?php
-include 'db_connect.php';
 require_once 'session.php';
-checkAuth(); // Ensure user is logged in
+requireLogin(); // locks page to logged-in users
 
+// Fetch last Internet Bill payment (customer_id = 0)
+$last_payment_result = $conn->query("SELECT MAX(date_paid) AS last_paid FROM payments WHERE customer_id = 0");
+$last_paid = $last_payment_result->fetch_assoc()['last_paid'];
+
+// ... rest of code
 // Fetch last Internet Bill payment (customer_id = 0)
 $last_payment_result = $conn->query("SELECT MAX(date_paid) AS last_paid FROM payments WHERE customer_id = 0");
 $last_paid = $last_payment_result->fetch_assoc()['last_paid'];

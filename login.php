@@ -1,5 +1,8 @@
 <?php
+//so logged-in users can’t loop back:
 require_once 'session.php';
+preventLoginLoop();
+
 
 if (isLoggedIn()) {
     header("Location: dashboard.php");

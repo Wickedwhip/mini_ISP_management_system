@@ -1,40 +1,51 @@
 <?php
 session_start();
 
-// Database connection (adjust credentials as needed)
+// Database connection
 $host = 'localhost';
-$user = 'your_username';
-$pass = 'your_password';
-$db = 'nettrack_db';
+$user = 'root';
+$pass = '';
+$db = 'mini_isp_management_system';
 
 $conn = new mysqli($host, $user, $pass, $db);
-
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Function to check if user is logged in
+// Check if user is logged in
 function isLoggedIn() {
     return isset($_SESSION['user_id']);
 }
 
-// Function to redirect to login if not authenticated
-function checkAuth() {
+// Force login for protected pages
+function requireLogin() {
     if (!isLoggedIn()) {
         header("Location: login.php");
         exit();
     }
 }
 
-// Function to authenticate user
+// Prevent logged-in users from accessing login page
+function preventLoginLoop() {
+    if (isLoggedIn()) {
+        header("Location: dashboard.php");
+        exit();
+    }
+}
+
+// Authenticate user
 function authenticate($username, $password) {
     global $conn;
-    
+
     $stmt = $conn->prepare("SELECT id, username, password FROM users WHERE username = ?");
+    if (!$stmt) {
+        die("Prepare failed: " . $conn->error);
+    }
+
     $stmt->bind_param("s", $username);
     $stmt->execute();
     $result = $stmt->get_result();
-    
+
     if ($result->num_rows === 1) {
         $user = $result->fetch_assoc();
         if (password_verify($password, $user['password'])) {
@@ -46,11 +57,20 @@ function authenticate($username, $password) {
     return false;
 }
 
-// Function to logout
+// Logout user
 function logout() {
     session_unset();
     session_destroy();
     header("Location: login.php");
     exit();
+}
+
+// Optional: session timeout (e.g., 30 min)
+function checkTimeout() {
+    $timeout_duration = 1800; // 30 minutes
+    if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY']) > $timeout_duration) {
+        logout();
+    }
+    $_SESSION['LAST_ACTIVITY'] = time();
 }
 ?>

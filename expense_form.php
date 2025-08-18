@@ -1,11 +1,12 @@
-<!-- expense_form.php -->
 <?php
 require_once 'session.php';
-checkAuth(); // Ensure user is logged in
+requireLogin(); // locks page to logged-in users
 
-session_start();
-include("db_connect.php"); // connect to your mini_ISP_management_system DB
+// Fetch last Internet Bill payment (customer_id = 0)
+$last_payment_result = $conn->query("SELECT MAX(date_paid) AS last_paid FROM payments WHERE customer_id = 0");
+$last_paid = $last_payment_result->fetch_assoc()['last_paid'];
 
+// ... rest of code
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $expense_name = $_POST['expense_name'];
     $amount = $_POST['amount'];

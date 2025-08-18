@@ -1,9 +1,8 @@
 <?php
 require_once 'session.php';
-checkAuth(); // Ensure user is logged in
+requireLogin(); // locks page to logged-in users
+checkTimeout(); // optional, for session expiry
 
-// Database connection
-include 'db_connect.php';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST['name'];
     $phone = $_POST['phone'];
@@ -15,16 +14,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $start_date = $_POST['start_date'];
     $status = $_POST['status'];
 
-    $sql = "INSERT INTO customers (name, phone, address, package, install_fee, router_cost, ethernet_cost, start_date, status) 
-            VALUES ('$name', '$phone', '$address', '$package', '$install_fee', '$router_cost', '$ethernet_cost', '$start_date', '$status')";
-
-    if ($conn->query($sql) === TRUE) {
-        echo "<p class='success'>✅ New customer added successfully!</p>";
+    // Prepare statement
+    $stmt = $conn->prepare("INSERT INTO customers (name, phone, address, package, install_fee, router_cost, ethernet_cost, start_date, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    if ($stmt === false) {
+        echo "<p class='error'>❌ Prepare failed: " . $conn->error . "</p>";
     } else {
-        echo "<p class='error'>❌ Error: " . $conn->error . "</p>";
+        $stmt->bind_param("ssssdddss", $name, $phone, $address, $package, $install_fee, $router_cost, $ethernet_cost, $start_date, $status);
+        if ($stmt->execute()) {
+            echo "<p class='success'>✅ New customer added successfully!</p>";
+        } else {
+            echo "<p class='error'>❌ Error: " . $stmt->error . "</p>";
+        }
+        $stmt->close();
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html>

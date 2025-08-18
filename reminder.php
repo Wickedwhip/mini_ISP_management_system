@@ -1,12 +1,12 @@
 <?php
-include 'db_connect.php';
 require_once 'session.php';
-checkAuth(); // Ensure user is logged in
+requireLogin(); // locks page to logged-in users
 
-// Fetch last payment date
-$last_payment_result = $conn->query("SELECT MAX(date_paid) AS last_paid FROM expenses WHERE type='internet'");
+// Fetch last Internet Bill payment (customer_id = 0)
+$last_payment_result = $conn->query("SELECT MAX(date_paid) AS last_paid FROM payments WHERE customer_id = 0");
 $last_paid = $last_payment_result->fetch_assoc()['last_paid'];
 
+// ... rest of code
 // Calculate next due date (30 days after last paid)
 $next_due = $last_paid ? date('Y-m-d', strtotime($last_paid . ' +30 days')) : null;
 $today = date('Y-m-d');

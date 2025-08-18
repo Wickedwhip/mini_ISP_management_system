@@ -1,7 +1,12 @@
 <?php
-include 'db_connect.php';
 require_once 'session.php';
-checkAuth(); // Ensure user is logged in
+requireLogin(); // locks page to logged-in users
+
+// Fetch customers for filter dropdown
+$customers = $conn->query("SELECT id, name FROM customers");
+
+// ... rest of your code
+
 
 // Fetch customers for filter dropdown
 $customers = $conn->query("SELECT id, name FROM customers");
