@@ -1,7 +1,8 @@
 <?php
 include 'db_connect.php';
 require_once 'session.php';
-checkAuth(); // Ensure user is logged in
+requireLogin();
+checkTimeout(); // optional, enforces session timeout
 
 $search = '';
 if (isset($_GET['search'])) {
@@ -16,6 +17,7 @@ $sql = "SELECT * FROM customers
         ORDER BY id DESC";
 $result = $conn->query($sql);
 ?>
+
 
 <!DOCTYPE html>
 <html>
@@ -47,7 +49,7 @@ $result = $conn->query($sql);
             <th>Phone</th>
             <th>Address</th>
             <th>Package</th>
-            <th>Install Fee</th>
+            <th>Installation Fee</th>
             <th>Router Cost</th>
             <th>Ethernet Cost</th>
             <th>Start Date</th>
@@ -61,7 +63,7 @@ $result = $conn->query($sql);
                     <td><?= htmlspecialchars($row['phone']) ?></td>
                     <td><?= htmlspecialchars($row['address']) ?></td>
                     <td><?= htmlspecialchars($row['package']) ?></td>
-                    <td><?= number_format($row['install_fee'],2) ?></td>
+                    <td><?= number_format($row['installation_fee'],2) ?></td>
                     <td><?= number_format($row['router_cost'],2) ?></td>
                     <td><?= number_format($row['ethernet_cost'],2) ?></td>
                     <td><?= $row['start_date'] ?></td>

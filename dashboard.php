@@ -243,7 +243,7 @@ if (!function_exists('time_elapsed_string')) {
         <div class="logo"><h2>Nettrack</h2></div>
         <div class="nav-menu">
             <a href="dashboard.php" class="nav-item active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
-            <a href="customer_reg.php" class="nav-item"><i class="fas fa-users"></i> Customers</a>
+            <a href="customer_reg.php" class="nav-item"><i class="fas fa-users"></i> Add Customers</a>
             <a href="payments.php" class="nav-item"><i class="fas fa-money-bill-wave"></i> Payments</a>
             <a href="payment_overview.php" class="nav-item"><i class="fas fa-chart-line"></i> Payment Overview</a>
             <a href="expense_form.php" class="nav-item"><i class="fas fa-receipt"></i> Expenses</a>
@@ -251,6 +251,8 @@ if (!function_exists('time_elapsed_string')) {
             <a href="reminder.php" class="nav-item"><i class="fas fa-bell"></i> Reminders</a>
             <a href="search.php" class="nav-item"><i class="fas fa-search"></i> Search</a>
             <a href="logout.php" class="nav-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <a href="customer_management.php" class="nav-item"><i class="fas fa-user-cog"></i> Manage Customers</a>
+
         </div>
     </div>
 
@@ -291,6 +293,8 @@ if (!function_exists('time_elapsed_string')) {
             <a href="payments.php" class="action-card"><i class="fas fa-money-bill-alt"></i><h3>Record Payment</h3></a>
             <a href="expense_form.php" class="action-card"><i class="fas fa-plus-circle"></i><h3>Add Expense</h3></a>
             <a href="reminder.php" class="action-card"><i class="fas fa-bell"></i><h3>Set Reminder</h3></a>
+            <a href="customer_management.php" class="action-card"><i class="fas fa-users-cog"></i><h3>Manage Customers</h3></a>
+
         </div>
 
         <div class="charts-container">

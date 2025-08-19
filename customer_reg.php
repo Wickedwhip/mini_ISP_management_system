@@ -8,18 +8,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $phone = $_POST['phone'];
     $address = $_POST['address'];
     $package = $_POST['package'];
-    $install_fee = $_POST['install_fee'];
+    $installation_fee = $_POST['installation_fee'];
     $router_cost = $_POST['router_cost'];
     $ethernet_cost = $_POST['ethernet_cost'];
     $start_date = $_POST['start_date'];
     $status = $_POST['status'];
 
     // Prepare statement
-    $stmt = $conn->prepare("INSERT INTO customers (name, phone, address, package, install_fee, router_cost, ethernet_cost, start_date, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO customers (name, phone, address, package, installation_fee, router_cost, ethernet_cost, start_date, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
     if ($stmt === false) {
         echo "<p class='error'>❌ Prepare failed: " . $conn->error . "</p>";
     } else {
-        $stmt->bind_param("ssssdddss", $name, $phone, $address, $package, $install_fee, $router_cost, $ethernet_cost, $start_date, $status);
+        $stmt->bind_param("ssssdddss", $name, $phone, $address, $package, $installation_fee, $router_cost, $ethernet_cost, $start_date, $status);
         if ($stmt->execute()) {
             echo "<p class='success'>✅ New customer added successfully!</p>";
         } else {
@@ -99,8 +99,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <label>Package:</label>
             <input type="text" name="package">
 
-            <label>Install Fee:</label>
-            <input type="number" step="0.01" name="install_fee">
+            <label>Installation Fee:</label>
+            <input type="number" step="0.01" name="installation_fee">
 
             <label>Router Cost:</label>
             <input type="number" step="0.01" name="router_cost">
