@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 18, 2025 at 03:38 PM
+-- Generation Time: Aug 22, 2025 at 03:44 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -40,6 +40,14 @@ CREATE TABLE `customers` (
   `status` enum('active','inactive') DEFAULT 'active'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `customers`
+--
+
+INSERT INTO `customers` (`id`, `name`, `phone`, `location`, `package`, `installation_fee`, `router_cost`, `ethernet_cost`, `start_date`, `status`) VALUES
+(6, 'Joe Kinyanjui', '0740597187', 'rongai', '5mb/s', 1000.00, 1100.00, 100.00, '2025-08-22', 'active'),
+(7, 'Ocs Mike', '0799684835', 'Ruiru', '5mb/s', 1000.00, 1100.00, 200.00, '2025-08-22', 'active');
+
 -- --------------------------------------------------------
 
 --
@@ -53,6 +61,13 @@ CREATE TABLE `expenses` (
   `date` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `expenses`
+--
+
+INSERT INTO `expenses` (`id`, `expense_name`, `amount`, `date`) VALUES
+(1, 'Wifi Package', 2500.00, '2025-08-22');
+
 -- --------------------------------------------------------
 
 --
@@ -65,8 +80,17 @@ CREATE TABLE `payments` (
   `amount` decimal(10,2) NOT NULL,
   `date_paid` date NOT NULL,
   `method` varchar(20) DEFAULT NULL,
-  `remarks` varchar(100) DEFAULT NULL
+  `remarks` varchar(100) DEFAULT NULL,
+  `bill_type` enum('customer','internet') DEFAULT 'customer'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `payments`
+--
+
+INSERT INTO `payments` (`id`, `customer_id`, `amount`, `date_paid`, `method`, `remarks`, `bill_type`) VALUES
+(7, 6, 2200.00, '2025-08-22', 'Mpesa', 'Good', 'internet'),
+(9, 7, 2300.00, '2025-08-22', 'Mpesa', 'Excellent', 'internet');
 
 -- --------------------------------------------------------
 
@@ -125,19 +149,19 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `customers`
 --
 ALTER TABLE `customers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `expenses`
 --
 ALTER TABLE `expenses`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `payments`
 --
 ALTER TABLE `payments`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `users`
