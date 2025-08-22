@@ -5,39 +5,42 @@ requireLogin(); // locks page to logged-in users
 // Fetch customers for filter dropdown
 $customers = $conn->query("SELECT id, name FROM customers");
 
-// ... rest of your code
-
-
-// Fetch customers for filter dropdown
-$customers = $conn->query("SELECT id, name FROM customers");
-
-// Filter variables
-$customer_id = isset($_GET['customer_id']) ? $_GET['customer_id'] : '';
-$from_date = isset($_GET['from_date']) ? $_GET['from_date'] : '';
-$to_date = isset($_GET['to_date']) ? $_GET['to_date'] : '';
+// Filter vars
+$customer_id = $_GET['customer_id'] ?? '';
+$from_date   = $_GET['from_date'] ?? '';
+$to_date     = $_GET['to_date'] ?? '';
 
 // Build query
-$sql = "SELECT p.*, c.name AS customer_name FROM payments p 
-        JOIN customers c ON p.customer_id = c.id 
+$sql = "SELECT p.*, 
+               c.name AS customer_name,
+               (
+                   SELECT MAX(p2.date_paid) 
+                   FROM payments p2 
+                   WHERE p2.customer_id = p.customer_id 
+                     AND p2.bill_type = 'internet'
+               ) AS last_internet_payment
+        FROM payments p
+        JOIN customers c ON p.customer_id = c.id
         WHERE 1=1";
 
-if ($customer_id != '') $sql .= " AND p.customer_id = '$customer_id'";
-if ($from_date != '') $sql .= " AND p.date_paid >= '$from_date'";
-if ($to_date != '') $sql .= " AND p.date_paid <= '$to_date'";
+if ($customer_id !== '') $sql .= " AND p.customer_id = '$customer_id'";
+if ($from_date   !== '') $sql .= " AND p.date_paid >= '$from_date'";
+if ($to_date     !== '') $sql .= " AND p.date_paid <= '$to_date'";
 
 $sql .= " ORDER BY p.date_paid DESC";
 
 $result = $conn->query($sql);
 
-// Calculate total
+// Collect rows
+$rows = [];
 $total = 0;
-if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {
-        $total += $row['amount'];
+if ($result && $result->num_rows > 0) {
+    while ($r = $result->fetch_assoc()) {
+        $rows[] = $r;
+        $total += $r['amount'];
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -59,8 +62,10 @@ if ($result->num_rows > 0) {
     <form method="GET">
         <select name="customer_id">
             <option value="">-- All Customers --</option>
-            <?php while($c = $customers->fetch_assoc()): ?>
-                <option value="<?= $c['id'] ?>" <?= $c['id']==$customer_id?'selected':'' ?>><?= htmlspecialchars($c['name']) ?></option>
+            <?php while ($c = $customers->fetch_assoc()): ?>
+                <option value="<?= $c['id'] ?>" <?= $c['id']==$customer_id?'selected':'' ?>>
+                    <?= htmlspecialchars($c['name']) ?>
+                </option>
             <?php endwhile; ?>
         </select>
 
@@ -77,9 +82,11 @@ if ($result->num_rows > 0) {
             <th>Date Paid</th>
             <th>Method</th>
             <th>Remarks</th>
+            <th>Last Internet Payment</th>
         </tr>
-        <?php if ($result->num_rows > 0): ?>
-            <?php foreach($conn->query($sql) as $row): ?>
+
+        <?php if (!empty($rows)): ?>
+            <?php foreach ($rows as $row): ?>
                 <tr>
                     <td><?= $row['id'] ?></td>
                     <td><?= htmlspecialchars($row['customer_name']) ?></td>
@@ -87,10 +94,11 @@ if ($result->num_rows > 0) {
                     <td><?= $row['date_paid'] ?></td>
                     <td><?= htmlspecialchars($row['method']) ?></td>
                     <td><?= htmlspecialchars($row['remarks']) ?></td>
+                    <td><?= $row['last_internet_payment'] ?: '—' ?></td>
                 </tr>
             <?php endforeach; ?>
         <?php else: ?>
-            <tr><td colspan="6" style="text-align:center;">No payments found.</td></tr>
+            <tr><td colspan="7" style="text-align:center;">No payments found.</td></tr>
         <?php endif; ?>
     </table>
 

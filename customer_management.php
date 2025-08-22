@@ -42,7 +42,7 @@ $result = $conn->query("SELECT * FROM customers ORDER BY id DESC");
             <th>ID</th>
             <th>Name</th>
             <th>Phone</th>
-            <th>Address</th>
+            <th>location</th>
             <th>Package</th>
             <th>Install Fee</th>
             <th>Router Cost</th>
@@ -57,7 +57,7 @@ $result = $conn->query("SELECT * FROM customers ORDER BY id DESC");
                 <td><?= $row['id'] ?></td>
                 <td><?= htmlspecialchars($row['name']) ?></td>
                 <td><?= htmlspecialchars($row['phone']) ?></td>
-                <td><?= htmlspecialchars($row['address']) ?></td>
+                <td><?= htmlspecialchars($row['location']) ?></td>
                 <td><?= htmlspecialchars($row['package']) ?></td>
                 <td><?= number_format($row['installation_fee'],2) ?></td>
                 <td><?= number_format($row['router_cost'],2) ?></td>

@@ -6,7 +6,7 @@ checkTimeout(); // optional, for session expiry
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST['name'];
     $phone = $_POST['phone'];
-    $address = $_POST['address'];
+    $location = $_POST['location'];
     $package = $_POST['package'];
     $installation_fee = $_POST['installation_fee'];
     $router_cost = $_POST['router_cost'];
@@ -15,11 +15,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $status = $_POST['status'];
 
     // Prepare statement
-    $stmt = $conn->prepare("INSERT INTO customers (name, phone, address, package, installation_fee, router_cost, ethernet_cost, start_date, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO customers 
+        (name, phone, location, package, installation_fee, router_cost, ethernet_cost, start_date, status) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
     if ($stmt === false) {
         echo "<p class='error'>❌ Prepare failed: " . $conn->error . "</p>";
     } else {
-        $stmt->bind_param("ssssdddss", $name, $phone, $address, $package, $installation_fee, $router_cost, $ethernet_cost, $start_date, $status);
+        // 9 params → match with 9 types
+        $stmt->bind_param("ssssdddss", 
+            $name, 
+            $phone, 
+            $location, 
+            $package, 
+            $installation_fee, 
+            $router_cost, 
+            $ethernet_cost, 
+            $start_date, 
+            $status
+        );
+
         if ($stmt->execute()) {
             echo "<p class='success'>✅ New customer added successfully!</p>";
         } else {
@@ -29,8 +43,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 ?>
-
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -93,8 +105,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <label>Phone:</label>
             <input type="text" name="phone" required>
 
-            <label>Address:</label>
-            <input type="text" name="address">
+            <label>Location:</label>
+            <input type="text" name="location">
 
             <label>Package:</label>
             <input type="text" name="package">
