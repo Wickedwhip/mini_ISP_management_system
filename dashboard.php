@@ -45,6 +45,16 @@ function columnExists($conn, $table, $column) {
 if (!isset($conn)) {
     die("Database connection not found. Check session.php");
 }
+// ===== Customer Payment Stats =====
+$totalCustomers = $conn->query("SELECT COUNT(*) AS total FROM customers")->fetch_assoc()['total'];
+$paidCustomers = $conn->query("
+    SELECT COUNT(DISTINCT customer_id) AS paid
+    FROM payments
+    WHERE bill_type='internet' 
+      AND date_paid >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+")->fetch_assoc()['paid'];
+
+$unpaidCustomers = $totalCustomers - $paidCustomers;
 
 // -- Stats (safe) -------------------------------------------------
 $totalCustomers = singleValue($conn, "SELECT COUNT(*) AS total FROM customers");
@@ -54,7 +64,12 @@ $totalExpenses  = singleValue($conn, "SELECT SUM(amount) AS total FROM expenses"
 // Overdue: try to use date_paid; otherwise 0
 $overdueAmount = 0;
 if (columnExists($conn, 'payments', 'date_paid')) {
-    $overdueAmount = singleValue($conn, "SELECT SUM(amount) AS total FROM payments WHERE date_paid < NOW() AND customer_id = 0");
+$overdueAmount = singleValue($conn, "
+    SELECT SUM(amount) AS total 
+    FROM payments 
+    WHERE bill_type='internet' AND date_paid <= DATE_SUB(CURDATE(), INTERVAL 30 DAY)
+");
+
 }
 
 // -- Recent Activity (payments, customers, expenses) ---------------
@@ -244,14 +259,15 @@ if (!function_exists('time_elapsed_string')) {
         <div class="nav-menu">
             <a href="dashboard.php" class="nav-item active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
             <a href="customer_reg.php" class="nav-item"><i class="fas fa-users"></i> Add Customers</a>
-            <a href="payments.php" class="nav-item"><i class="fas fa-money-bill-wave"></i> Payments</a>
+            <a href="customer_management.php" class="nav-item"><i class="fas fa-user-cog"></i> Manage Customers</a>
+            <a href="payments.php" class="nav-item"><i class="fas fa-money-bill-wave"></i> payments</a>
             <a href="payment_overview.php" class="nav-item"><i class="fas fa-chart-line"></i> Payment Overview</a>
             <a href="expense_form.php" class="nav-item"><i class="fas fa-receipt"></i> Expenses</a>
             <a href="pl_report.php" class="nav-item"><i class="fas fa-file-invoice-dollar"></i> P&L Report</a>
             <a href="reminder.php" class="nav-item"><i class="fas fa-bell"></i> Reminders</a>
             <a href="search.php" class="nav-item"><i class="fas fa-search"></i> Search</a>
             <a href="logout.php" class="nav-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
-            <a href="customer_management.php" class="nav-item"><i class="fas fa-user-cog"></i> Manage Customers</a>
+            
 
         </div>
     </div>
@@ -288,12 +304,27 @@ if (!function_exists('time_elapsed_string')) {
             </div>
         </div>
 
+        <div class="stats-container">
+            <!-- new payment stats -->
+            <div class="stat-card" style="border-left:4px solid green">
+                <h3>Customers Paid</h3>
+                <div class="value"><?= $paidCustomers ?></div>
+            </div>
+            <div class="stat-card" style="border-left:4px solid red">
+                <h3>Customers Unpaid</h3>
+                <div class="value"><?= $unpaidCustomers ?></div>
+            </div>
+        </div>
+
+
         <div class="quick-actions">
             <a href="customer_reg.php" class="action-card"><i class="fas fa-user-plus"></i><h3>Add Customer</h3></a>
             <a href="payments.php" class="action-card"><i class="fas fa-money-bill-alt"></i><h3>Record Payment</h3></a>
+
+             <a href="customer_management.php" class="action-card"><i class="fas fa-users-cog"></i><h3>Manage Customers</h3></a>
             <a href="expense_form.php" class="action-card"><i class="fas fa-plus-circle"></i><h3>Add Expense</h3></a>
             <a href="reminder.php" class="action-card"><i class="fas fa-bell"></i><h3>Set Reminder</h3></a>
-            <a href="customer_management.php" class="action-card"><i class="fas fa-users-cog"></i><h3>Manage Customers</h3></a>
+           
 
         </div>
 
